@@ -34,7 +34,7 @@ def Prism.exec(cmd)
   res
 end
 
-def Prism.download_dwarfs(version)
+def Prism.update_archive()
   ensure_existence_of_dwarfs_cache_dir()
   FileUtils.mkdir_p(work_dir())
   Dir.chdir(work_dir()) do
@@ -54,9 +54,16 @@ def Prism.download_dwarfs(version)
       exec("git clean -f -f -d") # http://stackoverflow.com/questions/9314365/git-clean-is-not-removing-a-submodule-added-to-a-branch-when-switching-branches
       exec("git reset --hard HEAD^") # use previous commit to make working tree resilient to amends
       exec("git pull --ff-only \"#{archive_pull_url()}\"")
+    end
+  end
+end
 
+def Prism.download_dwarfs(version)
+  update_archive()
+  Dir.chdir(work_dir()) do
+    Dir.chdir("totalfinder-archive") do
       # find revision with our version
-      rev = `git log --grep="#{version}" -n 1`
+      rev = exec("git log --grep=\"#{version}\" -n 1")
       commit = rev.split("\n")[0].split(" ")[1].strip
 
       die "failed to retrieve commit of dwarfs version #{version}" if commit.empty?

@@ -14,7 +14,7 @@ program :version, Prism::VERSION
 program :description, 'Symbol resolver for BinaryAge crash reports.'
 
 global_option('-w', '--workspace PATH', 'Override workspace directory (for caches)') { |workspace| Prism.config[:workspace] = workspace }
-global_option('-t', '--token GITHUB-TOKEN', 'GitHub token for accessing dwarfs archive repo') { |token| Prism.config[:token] = token }
+global_option('-t', '--token TOKEN', 'GitHub token for accessing dwarfs archive repo') { |token| Prism.config[:token] = token }
 
 command :show do |c|
   c.syntax = 'prism show GIST-ID'
@@ -55,5 +55,14 @@ command :clear do |c|
   c.action do |args, options|
     Prism::clear_caches()
     puts "done (in #{Prism.config[:workspace].blue})"
+  end
+end
+
+command :warm do |c|
+  c.syntax = 'prism warm'
+  c.description = 'Warm prism archive repo (speed up lookups in future)'
+  c.action do |args, options|
+    Prism::update_archive()
+    puts "done (in #{Prism.work_dir().blue})"
   end
 end
