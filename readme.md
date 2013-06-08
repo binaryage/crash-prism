@@ -1,0 +1,7 @@
+# Crash PRISM
+
+**Crash PRISM** is a custom command-line tool and a web server for symbolizing crash dumps of our apps from BinaryAge.
+
+It is NOT a secret electronic surveillance program, formally classified as top secret, that has been run by the United States National Security Agency (NSA) since 2007.
+
+
