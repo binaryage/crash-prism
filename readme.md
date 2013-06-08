@@ -11,3 +11,5 @@ It is NOT a secret electronic surveillance program, formally classified as top s
     bundle install
     bin/prism sym some/path/to/Finder.crash
     bin/prism show <gist-sha>
+
+#### License: [MIT](https://raw.github.com/binaryage/crash-prism/master/license.txt)
