@@ -46,12 +46,9 @@ def Prism.download_dwarfs(version)
 
       # find revision with our version
       rev = `git log --grep="#{version}" -n 1`
-      commit = rev.split("\n")[0].split(" ")[1]
+      commit = rev.split("\n")[0].split(" ")[1].strip
 
-      if commit.empty? then
-        puts "failed to retrieve commit of dwarfs version #{version}"
-        exit 2
-      end
+      die "failed to retrieve commit of dwarfs version #{version}" if commit.empty?
 
       # checkout our version
       system("git checkout #{commit}")

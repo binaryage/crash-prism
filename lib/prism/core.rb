@@ -1,5 +1,10 @@
 require 'octokit'
 
+def Prism.die(message, status=1)
+  $stderr.puts message.red
+  exit status
+end
+
 def Prism.create_github_client
   Octokit::Client.new(
     :auto_traversal => true
@@ -88,25 +93,16 @@ def Prism.resolve_symbol(symbol_address, module_name, hint, crash_report)
     load_address = hints[0]
   end
   version = lookup_module_version(module_name, crash_report)
-  unless version then
-    puts "unable to lookup version for module #{module_name}@#{version}"
-    exit 30
-  end
+  die "unable to lookup version for module #{module_name}" unless version
 
   dsym_path = dsym_path_for_module_and_version(module_name, version)
-  unless dsym_path then
-    puts "unable to retrive dsym_path for module #{module_name}@#{version}"
-    exit 30
-  end
+  die "unable to retrive dsym_path for module #{module_name}@#{version}" unless dsym_path
 
   arch = "x86_64" # TODO: this could be configurable in the future
 
   cmd = "atos -arch #{arch} -o \"#{dsym_path}\" -l #{load_address} #{symbol_address} 2>/dev/null"
   res = `#{cmd}`.strip
-  unless $?.success? then
-    puts "failed: #{cmd}"
-    exit 40
-  end
+  die "failed: #{cmd}" unless $?.success?
 
   res
 end
@@ -130,6 +126,6 @@ end
 
 def Prism.symbolize_crash_report_from_sha(sha)
   crash_report = get_crash_report(sha)
-  return if crash_report.nil?
+  return unless crash_report
   symbolize_crash_report(crash_report)
 end

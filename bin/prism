@@ -3,6 +3,7 @@
 require 'rubygems'
 require 'bundler/setup'
 require 'commander/import'
+require 'colored'
 
 LIB_DIR = File.expand_path(File.join(File.dirname(__FILE__), '../lib'))
 require File.join(LIB_DIR, 'prism.rb')
@@ -19,7 +20,10 @@ command :show do |c|
   c.syntax = 'prism show GIST-ID'
   c.description = 'Download crash report and symbolize it on stdout'
   c.action do |args, options|
-    puts Prism.symbolize_crash_report_from_sha(args[0])
+    sha = args[0]
+    res = Prism.symbolize_crash_report_from_sha(sha)
+    Prism.die "unable to fetch gist id=#{sha}" unless res
+    puts res
   end
 end
 
@@ -27,13 +31,9 @@ command :get do |c|
   c.syntax = 'prism get GIST-ID'
   c.description = 'Download crash report and print it on stdout'
   c.action do |args, options|
-    res = Prism::get_crash_report(args[0])
-
-    unless res
-      puts "unable to fetch gist id=#{sha}"
-      exit 1
-    end
-
+    sha = args[0]
+    res = Prism::get_crash_report(sha)
+    Prism.die "unable to fetch gist id=#{sha}" unless res
     puts res
   end
 end
@@ -42,7 +42,9 @@ command :sym do |c|
   c.syntax = 'prism sym FILE'
   c.description = 'Symbolize crash report from file on stdout'
   c.action do |args, options|
-    crash_report = File.read args[0]
+    file = args[0]
+    Prism.die "unable to read: #{file}" unless File.exists? file
+    crash_report = File.read file
     puts Prism.symbolize_crash_report(crash_report)
   end
 end
@@ -52,5 +54,6 @@ command :clear do |c|
   c.description = 'Clear prism working directory'
   c.action do |args, options|
     Prism::clear_caches()
+    puts "done (in #{Prism.config[:workspace].blue})"
   end
 end
