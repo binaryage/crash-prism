@@ -9,7 +9,7 @@ It is NOT a secret electronic surveillance program, formally classified as top s
     git clone git@github.com:binaryage/crash-prism.git
     cd crash-prism
     bundle install
-    bin/prism sym some/path/to/Finder.crash
-    bin/prism show <gist-sha>
+    bundle exec bin/prism sym some/path/to/Finder.crash
+    bundle exec bin/prism show <gist-sha>
 
 #### License: [MIT](https://raw.github.com/binaryage/crash-prism/master/license.txt)

@@ -10,3 +10,4 @@ end
 require_relative 'prism/cache.rb'
 require_relative 'prism/dwarfs.rb'
 require_relative 'prism/core.rb'
+require_relative 'prism/server.rb'
