@@ -19,5 +19,6 @@ def Prism.serve(options={})
   puts "updating archive..."
   update_archive()
   PrismServer.set :port, options.port if options.port
+  PrismServer.set :environment, :production # force!
   PrismServer.run!
 end
