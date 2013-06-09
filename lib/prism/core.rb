@@ -73,7 +73,7 @@ def Prism.dsym_path_for_module_and_version(module_name, version)
     base = File.basename dsym
     # base is something like: BAKit.framework.dSYM or ColorfulSidebar.bundle.dSYM
     nick = base.downcase.split(".")[0]
-    if module_nick == nick then
+    if dsym_path.nil? and module_nick == nick then
       dsym_path = File.join(dwarfs, base)
     end
   end
