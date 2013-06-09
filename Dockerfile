@@ -1,6 +1,5 @@
-MAINTAINER Antonin Hildebrand "antonin@binaryage.com"
-
 FROM ubuntu
+MAINTAINER Antonin Hildebrand "antonin@binaryage.com"
 
 # make sure the package repository is up to date
 RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
