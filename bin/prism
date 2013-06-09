@@ -5,8 +5,7 @@ require 'bundler/setup'
 require 'commander/import'
 require 'colored'
 
-LIB_DIR = File.expand_path(File.join(File.dirname(__FILE__), '../lib'))
-require File.join(LIB_DIR, 'prism.rb')
+require_relative File.join('..', 'lib', 'prism.rb')
 
 # :name is optional, otherwise uses the basename of this executable
 program :name, 'Crash Prism'
