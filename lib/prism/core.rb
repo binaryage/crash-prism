@@ -117,8 +117,16 @@ def Prism.symbolize_crash_report(crash_report)
   # ...
 
   symbolized_crash_report = crash_report.gsub /^(\d+\s+)(com\.binaryage\..*?)(\s+)([xa-fA-F\d]+)(\s+)(.*)$/ do |m|
-    resolved_symbol = resolve_symbol($4, $2, $6, crash_report)
-    "#{$1}#{$2}#{$3}#{$4}#{$5}#{resolved_symbol}"
+    hint = $6
+    symbol = $4
+    module_name = $2
+    prefix = "#{$1}#{$2}#{$3}#{$4}#{$5}"
+    resolved_symbol = hint
+    # some binaries might forgot to strip symbols, in this case hint is already resolved symbol
+    if hint =~ /^0x/
+      resolved_symbol = resolve_symbol(symbol, module_name, hint, crash_report)
+    end
+    "#{prefix}#{resolved_symbol}"
   end
 
   return symbolized_crash_report
