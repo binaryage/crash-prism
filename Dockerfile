@@ -17,8 +17,5 @@ ADD . /prism
 RUN cd /prism && bundle install --system
 RUN ln -s /prism/bin/prism /usr/local/bin/prism && chmod +x /usr/local/bin/prism
 
-# expose prism port
-EXPOSE 3999
-
 # launch server when running container
 CMD ["prism", "serve", "--port", "3999", "--token", "$GITHUB_TOKEN", "--workspace", "/prism/workspace"]
