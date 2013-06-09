@@ -22,7 +22,8 @@ def Prism.dwarfs_exist?(version)
 end
 
 def Prism.archive_pull_url()
-  "#{@config[:token]}@github.com:binaryage/totalfinder-archive.git"
+  return "git@github.com:binaryage/totalfinder-archive.git" unless @config[:token]
+  "https://#{@config[:token]}@github.com/binaryage/totalfinder-archive.git"
 end
 
 def Prism.exec(cmd)

@@ -2,7 +2,7 @@ module Prism
   VERSION = "0.1.0"
   @config = {
     :workspace => "/tmp/crash-prism",
-    :token => "git"
+    :token => nil
   }
   class << self; attr_accessor :config; end # an ugly way how to expose Prism.config to outside world
 end
