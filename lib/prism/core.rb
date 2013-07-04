@@ -77,8 +77,12 @@ def Prism.dsym_path_for_module_and_version(module_id, version)
   Dir.glob(File.join(dwarfs, "*.dSYM")) do |dsym|
     base = File.basename dsym
     # base is something like: BAKit.framework.dSYM or ColorfulSidebar.bundle.dSYM
-    name = base.downcase.split(".").first
-    if dsym_path.nil? and module_name == name then
+    name_parts = base.downcase.split(".")
+    name = name_parts.first
+    ext = name_parts[-2]
+    # we have possible ambiguity here between TotalFinder shell, TotalFinder app and TotalFinder osax
+    # HACK: skip TotalFinder.app and TotalFinder.osax, keep only TotalFinder.bundle, because a crash in shell is most likely
+    if dsym_path.nil? and module_name == name and not (ext=="app" or ext=="osax") then
       dsym_path = File.join(dwarfs, base)
     end
   end
