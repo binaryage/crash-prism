@@ -12,19 +12,24 @@ def Prism.create_github_client
 end
 
 def Prism.get_crash_report(sha)
+  puts "getting crash report #{sha.magenta} from cache" if @config[:verbose]
   crash_report = get_gist_from_cache(sha)
   return crash_report unless crash_report.nil?
 
+  puts "no cache hit => reading #{sha.magenta} from github" if @config[:verbose]
   github = create_github_client()
   begin
     gist = github.gist(sha)
     crash_report = gist.files.first[1].content
   rescue
+    puts "failed to read #{sha.magenta} from github" if @config[:verbose]
     return
   end
 
+  puts "storing #{sha.magenta} into cache" if @config[:verbose]
   store_gist_to_cache(sha, crash_report)
 
+  puts "---" if @config[:verbose]
   crash_report
 end
 

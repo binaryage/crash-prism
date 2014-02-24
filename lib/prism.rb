@@ -1,5 +1,5 @@
 module Prism
-  VERSION = "0.1.0"
+  VERSION = "0.2.0"
   @config = {
     :workspace => "/tmp/crash-prism",
     :token => nil

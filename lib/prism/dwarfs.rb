@@ -1,4 +1,16 @@
 require 'fileutils'
+require 'tempfile'
+
+# http://stackoverflow.com/a/16598746/84283
+def capture_stdout
+  stdout = $stdout.dup
+  Tempfile.open 'stdout-redirect' do |temp|
+    $stdout.reopen temp.path, 'w+'
+    yield if block_given?
+    $stdout.reopen stdout
+    temp.read
+  end
+end
 
 def Prism.dwarfs_cache_dir
   File.join(cache_dir(), "dwarfs")
@@ -27,7 +39,14 @@ def Prism.archive_pull_url()
 end
 
 def Prism.exec(cmd)
-  res = `#{cmd} 2>&1`
+  if (@config[:verbose]) then
+    puts "> #{cmd.yellow}"
+    res = capture_stdout do
+      system("#{cmd} 2>&1")
+    end
+  else
+    res = `#{cmd} 2>&1`
+  end
   unless $?.success?
     puts res
     die "failed: #{cmd}"
