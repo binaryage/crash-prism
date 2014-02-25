@@ -84,6 +84,7 @@ def Prism.download_dwarfs(version)
     Dir.chdir("totalfinder-archive") do
       # find revision with our version
       rev = exec("git log --grep=\"#{version}\" -n 1")
+      die "unable to find archive commit with #{version}" if rev.nil?
       commit = rev.split("\n")[0].split(" ")[1].strip
 
       die "failed to retrieve commit of dwarfs version #{version}" if commit.empty?
