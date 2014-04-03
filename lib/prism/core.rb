@@ -20,7 +20,10 @@ def Prism.get_crash_report(sha)
   github = create_github_client()
   begin
     gist = github.gist(sha)
-    crash_report = gist.files.first[1].content
+    # this is fragile, we want to get first file from files
+    # unfortunately uderlying objects are not hashes, but Sawyer::Resource
+    key = gist.files.fields.to_a()[0] # first file key
+    crash_report = gist.files[key].content
   rescue
     puts "failed to read #{sha.magenta} from github" if @config[:verbose]
     return
