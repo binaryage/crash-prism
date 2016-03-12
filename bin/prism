@@ -71,14 +71,3 @@ command :warm do |c|
     puts "done (in #{Prism.work_dir().blue})"
   end
 end
-
-command :serve do |c|
-  c.syntax = 'prism serve'
-  c.description = 'Start prism server'
-  c.option '--port PORT', Integer, 'Server port'
-  c.action do |args, options|
-    options.default \
-      :port => 4489
-    Prism::serve(options)
-  end
-end
