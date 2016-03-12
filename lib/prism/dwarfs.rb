@@ -25,7 +25,7 @@ def Prism.ensure_existence_of_dwarfs_cache_dir
 end
 
 def Prism.dwarfs_path_in_cache(version)
-  File.join(dwarfs_cache_dir(), version)
+  File.join(dwarfs_cache_dir(), @config[:product].downcase+"v"+version)
 end
 
 def Prism.dwarfs_exist?(version)
@@ -101,7 +101,7 @@ def Prism.update_archive()
       # reset & update
       exec("git clean -f -f -d") # http://stackoverflow.com/questions/9314365/git-clean-is-not-removing-a-submodule-added-to-a-branch-when-switching-branches
       exec("git reset --hard HEAD^") # use previous commit to make working tree resilient to amends
-      exec("git pull --ff-only \"#{repo}\"")
+      exec("git pull --ff-only \"#{repo}\" #{branch}")
     end
   end
 end
@@ -112,15 +112,8 @@ def Prism.download_dwarfs(version)
     branch = product_branch()
     Dir.chdir(branch) do
       # find revision with our version
-      tag_matcher = "#{product_tag_prefix()}-v#{version}}"
-      rev = exec("git log --grep=\"#{tag_matcher}\" -n 1 --format=oneline")
-      die "unable to find archive commit with #{tag_matcher}" if rev.nil?
-      commit = rev.split("\n")[0].split(" ")[0].strip
-
-      die "failed to retrieve commit of dwarfs version #{version}" if commit.empty?
-
-      # checkout our version
-      exec("git checkout #{commit}")
+      expected_tag = "#{product_tag_prefix()}-v#{version}"
+      exec("git checkout \"#{expected_tag}\"")
 
       # copy dwarfs into cache (under version subfolder)
       dwarfs_path = dwarfs_path_in_cache(version)
