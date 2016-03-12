@@ -57,6 +57,7 @@ end
 def Prism.update_archive()
   ensure_existence_of_dwarfs_cache_dir()
   FileUtils.mkdir_p(work_dir())
+  puts "workdir '#{work_dir()}'"
   Dir.chdir(work_dir()) do
     unless File.exists?("totalfinder-archive")
       # see https://github.com/blog/1270-easier-builds-and-deployments-using-git-over-https-and-oauth
@@ -83,9 +84,9 @@ def Prism.download_dwarfs(version)
   Dir.chdir(work_dir()) do
     Dir.chdir("totalfinder-archive") do
       # find revision with our version
-      rev = exec("git log --grep=\"#{version}\" -n 1")
+      rev = exec("git log --grep=\"#{version}\" -n 1 --format=oneline")
       die "unable to find archive commit with #{version}" if rev.nil?
-      commit = rev.split("\n")[0].split(" ")[1].strip
+      commit = rev.split("\n")[0].split(" ")[0].strip
 
       die "failed to retrieve commit of dwarfs version #{version}" if commit.empty?
 
