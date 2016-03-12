@@ -1,4 +1,4 @@
-Copyright (c) 2013, BinaryAge Limited
+Copyright (c) BinaryAge Limited
 Contributors: https://github.com/binaryage/crash-prism/contributors
 All rights reserved.
 
