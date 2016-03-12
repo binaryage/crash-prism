@@ -14,11 +14,13 @@ program :description, 'Symbol resolver for BinaryAge crash reports.'
 
 # read ENV if present
 Prism.config[:workspace] = ENV["CRASH_PRISM_WORKSPACE"] if ENV["CRASH_PRISM_WORKSPACE"]
-Prism.config[:token] = ENV["CRASH_PRISM_TOKEN"] if ENV["CRASH_PRISM_TOKEN"]
+Prism.config[:product] = ENV["CRASH_PRISM_PRODUCT"] if ENV["CRASH_PRISM_PRODUCT"]
+Prism.config[:repo] = ENV["CRASH_PRISM_REPO"] if ENV["CRASH_PRISM_REPO"]
 Prism.config[:verbose] = true if ENV["CRASH_PRISM_VERBOSE"]
 
 global_option('-w', '--workspace PATH', 'Override workspace directory (for caches)') { |workspace| Prism.config[:workspace] = workspace }
-global_option('-t', '--token TOKEN', 'GitHub token for accessing dwarfs archive repo') { |token| Prism.config[:token] = token }
+global_option('-p', '--product PRODUCT', 'Product name to fetch correct archive') { |product| Prism.config[:product] = product }
+global_option('-r', '--repo REPO', 'Repo URL from which to checkout archives') { |repo| Prism.config[:repo] = repo }
 global_option('', '--verbose', 'Be verbose') { Prism.config[:verbose] = true }
 
 command :show do |c|
