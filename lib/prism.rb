@@ -1,5 +1,5 @@
 module Prism
-  VERSION = '0.3.0'
+  VERSION = '0.4.0'
   @config = {
       :workspace => '/tmp/crash-prism',
       :repo => 'git@github.com:binaryage/root.git', # you might need to specify token: https://
