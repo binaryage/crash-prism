@@ -7,7 +7,7 @@ end
 
 def Prism.create_github_client
   Octokit::Client.new(
-    :auto_traversal => true
+      :auto_traversal => true
   )
 end
 
