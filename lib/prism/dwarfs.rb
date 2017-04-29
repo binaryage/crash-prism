@@ -92,7 +92,6 @@ def Prism.update_archive
       puts "> #{cmd.yellow}"
       system(cmd) # this can take a long time, give user feedback
       unless $?.success?
-        puts res
         die "failed: #{cmd}"
       end
       exec("mv \"#{temp_folder}\" \"#{branch}\"")
