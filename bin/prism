@@ -73,3 +73,11 @@ command :warm do |c|
     puts "done (in #{Prism.work_dir.blue})"
   end
 end
+
+command :config do |c|
+  c.syntax = 'prism config'
+  c.description = 'Print prism config'
+  c.action do |_, _|
+    puts Prism.config
+  end
+end
