@@ -17,12 +17,12 @@ def Prism.get_crash_report(sha)
   return crash_report unless crash_report.nil?
 
   puts "no cache hit => reading #{sha.magenta} from github" if @config[:verbose]
-  github = create_github_client()
+  github = create_github_client
   begin
     gist = github.gist(sha)
     # this is fragile, we want to get first file from files
     # unfortunately uderlying objects are not hashes, but Sawyer::Resource
-    key = gist.files.fields.to_a()[0] # first file key
+    key = gist.files.fields.to_a[0] # first file key
     crash_report = gist.files[key].content
   rescue
     puts "failed to read #{sha.magenta} from github" if @config[:verbose]
@@ -32,19 +32,19 @@ def Prism.get_crash_report(sha)
   puts "storing #{sha.magenta} into cache" if @config[:verbose]
   store_gist_to_cache(sha, crash_report)
 
-  puts "---" if @config[:verbose]
+  puts '---' if @config[:verbose]
   crash_report
 end
 
-def Prism.clear_caches()
-  clear_gist_cache()
-  clear_dwarfs_cache()
-  clear_work_dir()
+def Prism.clear_caches
+  clear_gist_cache
+  clear_dwarfs_cache
+  clear_work_dir
 end
 
 # module name is lowercase last part of the identifier, eg. totalkit or dockprogressbar
 def Prism.module_id_to_name(module_id)
-  module_id.strip.downcase.split(".").last
+  module_id.strip.downcase.split('.').last
 end
 
 def Prism.lookup_module_load_address(module_name, crash_report)
@@ -54,8 +54,8 @@ def Prism.lookup_module_load_address(module_name, crash_report)
   # 0x10c4c9000 -        0x10c4d3ff7 +com.binaryage.totalfinder.dockprogressbar (1.4.10 - 1.4.10) <1BFC1C8D-E4FB-3833-BF2D-86717235EC55> /Library/ScriptingAdditions/TotalFinder.osax/Contents/Resources/TotalFinder.bundle/Contents/PlugIns/DockProgressBar.bundle/Contents/MacOS/DockProgressBar
 
   address = nil
-  crash_report.scan /^\s*([xa-fA-F\d]+)\s*-\s*([xa-fA-F\d]+)\s+\+(.*?)\s+\((.*?)\).*$/ do |m|
-    if module_id_to_name($3) == module_name then
+  crash_report.scan /^\s*([xa-fA-F\d]+)\s*-\s*([xa-fA-F\d]+)\s+\+(.*?)\s+\((.*?)\).*$/ do |_|
+    if module_id_to_name($3) == module_name
       address = $1.strip
     end
   end
@@ -69,9 +69,9 @@ def Prism.lookup_module_version(module_name, crash_report)
   # 0x10c4c9000 -        0x10c4d3ff7 +com.binaryage.totalfinder.dockprogressbar (1.4.10 - 1.4.10) <1BFC1C8D-E4FB-3833-BF2D-86717235EC55> /Library/ScriptingAdditions/TotalFinder.osax/Contents/Resources/TotalFinder.bundle/Contents/PlugIns/DockProgressBar.bundle/Contents/MacOS/DockProgressBar
 
   version = nil
-  crash_report.scan /^\s*([xa-fA-F\d]+)\s*-\s*([xa-fA-F\d]+)\s+\+(.*?)\s+\((.*?)\).*$/ do |m|
-    if module_id_to_name($3) == module_name then
-      version = $4.split("-")[0].strip
+  crash_report.scan /^\s*([xa-fA-F\d]+)\s*-\s*([xa-fA-F\d]+)\s+\+(.*?)\s+\((.*?)\).*$/ do |_|
+    if module_id_to_name($3) == module_name
+      version = $4.split('-')[0].strip
     end
   end
   version
@@ -82,22 +82,22 @@ def Prism.dsym_path_for_module_and_version(module_id, version)
   dwarfs = get_dwarfs(version) # if not cached, downloads proper version from github
 
   dsym_path = nil
-  Dir.glob(File.join(dwarfs, "*.dSYM")) do |dsym|
+  Dir.glob(File.join(dwarfs, '*.dSYM')) do |dsym|
     base = File.basename dsym
     # base is something like: BAKit.framework.dSYM or ColorfulSidebar.bundle.dSYM
-    name_parts = base.downcase.split(".")
+    name_parts = base.downcase.split('.')
     name = name_parts.first
     ext = name_parts[-2]
     # we have possible ambiguity here between TotalFinder shell, TotalFinder app and TotalFinder osax
     # HACK: skip TotalFinder.app and TotalFinder.osax, keep only TotalFinder.bundle, because a crash in shell is most likely
-    if dsym_path.nil? and module_name == name and not (ext=="app" or ext=="osax") then
+    if dsym_path.nil? and module_name == name and not (ext=='app' or ext=='osax')
       dsym_path = File.join(dwarfs, base)
     end
   end
 
   # dsym_path is something like "/Users/darwin/code/totalfinder/archive/dwarfs/Tabs.bundle.dSYM"
   # find first DWARF/something file in the subdirectory tree
-  Dir.glob(File.join(dsym_path, "**", "DWARF", "*"))[0]
+  Dir.glob(File.join(dsym_path, '**', 'DWARF', '*'))[0]
   # result: "/Users/darwin/code/totalfinder/archive/dwarfs/Tabs.bundle.dSYM/Contents/Resources/DWARF/Tabs"
 end
 
@@ -110,7 +110,7 @@ def Prism.resolve_symbol(symbol_address, module_name, crash_report)
   dsym_path = dsym_path_for_module_and_version(module_name, version)
   die "unable to retrive dsym_path for module #{module_name}@#{version}" unless dsym_path
 
-  arch = "x86_64" # TODO: this could be configurable in the future
+  arch = 'x86_64' # TODO: this could be configurable in the future
 
   cmd = "atos -arch #{arch} -o \"#{dsym_path}\" -l #{load_address} #{symbol_address} 2>/dev/null"
   res = `#{cmd}`.strip
@@ -121,7 +121,7 @@ end
 
 def Prism.retrieve_our_module_names(crash_report)
   list = []
-  crash_report.scan /\+(com\.binaryage\..*?)(\s+)/ do |m|
+  crash_report.scan /\+(com\.binaryage\..*?)(\s+)/ do |_|
     module_id = $1.strip
     list << module_id_to_name(module_id)
   end
@@ -139,18 +139,18 @@ def Prism.symbolize_crash_report(crash_report)
 
   our_modules = retrieve_our_module_names(crash_report)
 
-  symbolized_crash_report = crash_report.gsub /^(\d+\s+)(.*?)(\s+)([xa-fA-F\d]+)(\s+)(.*)$/ do |m|
+  symbolized_crash_report = crash_report.gsub /^(\d+\s+)(.*?)(\s+)([xa-fA-F\d]+)(\s+)(.*)$/ do |_|
     hint = $6
     symbol = $4
     module_name = $2.downcase
     prefix = "#{$1}#{$2}#{$3}#{$4}#{$5}"
     resolved_symbol = hint
 
-    if module_name =~ /^com\.binaryage\./ then
+    if module_name =~ /^com\.binaryage\./
       module_name = module_id_to_name(module_name)
     end
 
-    if our_modules.include? module_name then
+    if our_modules.include? module_name
       resolved_symbol = resolve_symbol(symbol, module_name, crash_report)
     end
 
