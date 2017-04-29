@@ -100,7 +100,7 @@ def Prism.update_archive
       # reset & update
       exec('git clean -f -f -d') # http://stackoverflow.com/questions/9314365/git-clean-is-not-removing-a-submodule-added-to-a-branch-when-switching-branches
       exec('git reset --hard HEAD^') # use previous commit to make working tree resilient to amends
-      exec("git pull --ff-only \"#{repo}\" #{branch}")
+      exec("git pull --tags --ff-only \"#{repo}\" #{branch}")
     end
   end
 end
