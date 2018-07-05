@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'octokit'
+require "English"
 
 def Prism.die(message, status = 1)
   warn message.red
@@ -77,24 +78,46 @@ def Prism.lookup_module_version(module_name, crash_report)
   version
 end
 
+def score(x)
+  case x
+  when 'app'
+    1
+  when 'osax'
+    2
+  else
+    0
+  end
+end
+
 def Prism.dsym_path(module_id, version)
   module_name = module_id_to_name(module_id)
   dwarfs = get_dwarfs(version) # if not cached, downloads proper version from github
 
-  dsym_path = nil
+  candidates = []
   Dir.glob(File.join(dwarfs, '*.dSYM')) do |dsym|
     base = File.basename dsym
     # base is something like: BAKit.framework.dSYM or ColorfulSidebar.bundle.dSYM
     name_parts = base.downcase.split('.')
     name = name_parts.first
     ext = name_parts[-2]
-    # we have possible ambiguity here between TotalFinder shell, TotalFinder app and TotalFinder osax
-    # HACK: skip TotalFinder.app and TotalFinder.osax, keep only TotalFinder.bundle, because a crash in shell is most likely
-    dsym_path = File.join(dwarfs, base) if dsym_path.nil? && (module_name == name) && !((ext == 'app') || (ext == 'osax'))
+
+    if module_name == name
+      dsym_path = File.join(dwarfs, base)
+      candidates << [dsym_path, ext]
+    end
   end
+
+  candidates.sort! do |a, b|
+    score(a.second) <=> score(b.second)
+  end
+
+  # we have possible ambiguity here between TotalFinder shell, TotalFinder app and TotalFinder osax
+  # HACK: sort app/osax stuff last because a crash in shell is most likely
+  die "unable to lookup DSYM for module '#{module_name}@#{version}'" if candidates.first.nil?
 
   # dsym_path is something like "/Users/darwin/code/totalfinder/archive/dwarfs/Tabs.bundle.dSYM"
   # find first DWARF/something file in the subdirectory tree
+  dsym_path = candidates.first.first
   Dir.glob(File.join(dsym_path, '**', 'DWARF', '*'))[0]
   # result: "/Users/darwin/code/totalfinder/archive/dwarfs/Tabs.bundle.dSYM/Contents/Resources/DWARF/Tabs"
 end
@@ -106,7 +129,7 @@ def Prism.resolve_symbol(symbol_address, module_name, crash_report)
   die "unable to lookup version for module #{module_name}" unless version
 
   dsym_path = dsym_path(module_name, version)
-  die "unable to retrive dsym_path for module #{module_name}@#{version}" unless dsym_path
+  die "unable to retrieve dsym_path for module #{module_name}@#{version}" unless dsym_path
 
   arch = 'x86_64' # TODO: this could be configurable in the future
 
