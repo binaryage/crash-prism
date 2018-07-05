@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
-gem 'thin'
-gem 'sinatra'
-gem 'octokit'
-gem 'commander'
 gem 'colored'
+gem 'commander'
+gem 'octokit'
+gem 'sinatra'
+gem 'thin'

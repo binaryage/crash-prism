@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'rubygems'
 require 'bundler/setup'
@@ -18,10 +19,14 @@ Prism.config[:product] = ENV['CRASH_PRISM_PRODUCT'] if ENV['CRASH_PRISM_PRODUCT'
 Prism.config[:repo] = ENV['CRASH_PRISM_REPO'] if ENV['CRASH_PRISM_REPO']
 Prism.config[:verbose] = true if ENV['CRASH_PRISM_VERBOSE']
 
-global_option('-w', '--workspace PATH', 'Override workspace directory (for caches)') {|workspace| Prism.config[:workspace] = workspace}
-global_option('-p', '--product PRODUCT', 'Product name to fetch correct archive') {|product| Prism.config[:product] = product}
-global_option('-r', '--repo REPO', 'Repo URL from which to checkout archives') {|repo| Prism.config[:repo] = repo}
-global_option('', '--verbose', 'Be verbose') {Prism.config[:verbose] = true}
+global_option('-w', '--workspace PATH', 'Override workspace directory (for caches)') do |workspace|
+  Prism.config[:workspace] = workspace
+end
+global_option('-p', '--product PRODUCT', 'Product name to fetch correct archive') do |product|
+  Prism.config[:product] = product
+end
+global_option('-r', '--repo REPO', 'Repo URL from which to checkout archives') { |repo| Prism.config[:repo] = repo }
+global_option('', '--verbose', 'Be verbose') { Prism.config[:verbose] = true }
 
 command :show do |c|
   c.syntax = 'prism show GIST-ID'
@@ -39,7 +44,7 @@ command :get do |c|
   c.description = 'Download crash report and print it on stdout'
   c.action do |args, _|
     sha = args[0]
-    res = Prism::get_crash_report(sha)
+    res = Prism.get_crash_report(sha)
     Prism.die "unable to fetch gist id=#{sha}" unless res
     puts res
   end
@@ -50,7 +55,7 @@ command :sym do |c|
   c.description = 'Symbolize crash report from file on stdout'
   c.action do |args, _|
     file = args[0]
-    Prism.die "unable to read: #{file}" unless File.exists? file
+    Prism.die "unable to read: #{file}" unless File.exist? file
     crash_report = File.read file
     puts Prism.symbolize_crash_report(crash_report)
   end
@@ -60,7 +65,7 @@ command :clear do |c|
   c.syntax = 'prism clear'
   c.description = 'Clear prism working directory'
   c.action do |_, _|
-    Prism::clear_caches()
+    Prism.clear_caches
     puts "done (in #{Prism.config[:workspace].blue})"
   end
 end
@@ -69,7 +74,7 @@ command :warm do |c|
   c.syntax = 'prism warm'
   c.description = 'Warm prism archive repo (speed up lookups in future)'
   c.action do |_, _|
-    Prism::update_archive()
+    Prism.update_archive
     puts "done (in #{Prism.work_dir.blue})"
   end
 end

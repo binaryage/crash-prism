@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 
 def Prism.cache_dir
@@ -18,7 +20,7 @@ end
 
 def Prism.get_gist_from_cache(sha)
   gist_path = gist_path_in_cache(sha)
-  return unless File.exists? gist_path
+  return unless File.exist? gist_path
   File.read(gist_path)
 end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tempfile'
 
@@ -20,22 +22,22 @@ def Prism.work_dir
   File.join(@config[:workspace], 'tmp')
 end
 
-def Prism.ensure_existence_of_dwarfs_cache_dir
+def Prism.ensure_dwarfs_cache_dir
   FileUtils.mkdir_p(dwarfs_cache_dir)
 end
 
 def Prism.dwarfs_path_in_cache(version)
-  File.join(dwarfs_cache_dir, @config[:product].downcase+'v'+version)
+  File.join(dwarfs_cache_dir, @config[:product].downcase + 'v' + version)
 end
 
 def Prism.dwarfs_exist?(version)
   dwarfs_path = dwarfs_path_in_cache(version)
-  File.exists?(dwarfs_path)
+  File.exist?(dwarfs_path)
 end
 
 # each product has own archive branch in the repo
 # by convention PRODUCT-archive
-# for example totalfinder-archive 
+# for example totalfinder-archive
 # or totalterminal-archive
 # https://github.com/binaryage/root/tree/totalfinder-archive
 def Prism.product_branch
@@ -49,8 +51,8 @@ end
 #   totalfinder-archive-v1.7.10
 #   totalfinder-archive-v1.7.11
 #   totalfinder-archive-v1.7.12
-# 
-#   or 
+#
+#   or
 #
 #   totalterminal-archive-v1.4.11
 #   totalterminal-archive-v1.5
@@ -70,7 +72,7 @@ def Prism.exec(cmd)
   else
     res = `#{cmd} 2>&1`
   end
-  unless $?.success?
+  unless $CHILD_STATUS.success?
     puts res
     die "failed: #{cmd}"
   end
@@ -78,12 +80,12 @@ def Prism.exec(cmd)
 end
 
 def Prism.update_archive
-  ensure_existence_of_dwarfs_cache_dir
+  ensure_dwarfs_cache_dir
   FileUtils.mkdir_p(work_dir)
   Dir.chdir(work_dir) do
     branch = product_branch
     repo = @config[:repo]
-    unless File.exists?(branch)
+    unless File.exist?(branch)
       # see https://github.com/blog/1270-easier-builds-and-deployments-using-git-over-https-and-oauth
       # don't do exec("git clone --recursive git@github.com:binaryage/totalfinder-archive.git")
       temp_folder = branch + '-test'
@@ -91,9 +93,7 @@ def Prism.update_archive
       cmd = "git clone -b \"#{branch}\" \"#{repo}\" \"#{temp_folder}\""
       puts "> #{cmd.yellow}"
       system(cmd) # this can take a long time, give user feedback
-      unless $?.success?
-        die "failed: #{cmd}"
-      end
+      die "failed: #{cmd}" unless $CHILD_STATUS.success?
       exec("mv \"#{temp_folder}\" \"#{branch}\"")
     end
     Dir.chdir(branch) do
@@ -123,9 +123,7 @@ def Prism.download_dwarfs(version)
 end
 
 def Prism.get_dwarfs(version)
-  unless dwarfs_exist?(version)
-    download_dwarfs(version)
-  end
+  download_dwarfs(version) unless dwarfs_exist?(version)
   dwarfs_path_in_cache(version)
 end
 
